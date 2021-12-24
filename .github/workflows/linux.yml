@@ -25,5 +25,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: mcg-linux
+          name: sponsor-sync
           path: ${{runner.workspace}}/sponsor-sync/target/release/sponsor-sync
