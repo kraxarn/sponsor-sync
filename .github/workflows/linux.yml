@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Test
+        run: cargo test --release
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: mcg-linux
+          path: ${{runner.workspace}}/sponsor-sync/target/release/sponsor-sync
