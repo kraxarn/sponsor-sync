@@ -36,6 +36,11 @@ pub fn new(default_cache: &PathBuf) -> App {
 		.takes_value(true)
 		.required(var("DATABASE_URL").is_err());
 
+	let reset_database = Arg::with_name(crate::args::RESET_DATABASE)
+		.short("r")
+		.long("reset")
+		.help("Reset all current values in the database first");
+
 	App::new(env!("CARGO_PKG_NAME"))
 		.version(env!("CARGO_PKG_VERSION"))
 		.author(env!("CARGO_PKG_AUTHORS"))
@@ -43,4 +48,5 @@ pub fn new(default_cache: &PathBuf) -> App {
 		.arg(database)
 		.arg(cache_dir)
 		.arg(database_url)
+		.arg(reset_database)
 }

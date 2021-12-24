@@ -33,6 +33,11 @@ async fn main() -> Result<(), sqlx::Error> {
 	let database_url = Db::get_url(&matches);
 	let db = Db::connect(&database_url).await.unwrap();
 
+	if matches.is_present(args::RESET_DATABASE) {
+		info!("Resetting database");
+		db.down().await.unwrap();
+	}
+
 	info!("Updating database");
 
 	db.up().await.unwrap();

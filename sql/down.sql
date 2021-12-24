@@ -1,0 +1,1 @@
+drop table sponsor_time

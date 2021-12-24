@@ -31,4 +31,10 @@ impl Db {
 			.execute(&self.pool)
 			.await
 	}
+
+	pub async fn down(&self) -> Result<PgQueryResult, sqlx::Error> {
+		query(include_str!("../sql/down.sql"))
+			.execute(&self.pool)
+			.await
+	}
 }

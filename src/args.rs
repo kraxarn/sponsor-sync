@@ -9,3 +9,6 @@ pub static DATABASE: &str = "database";
 
 /// Connection string to database
 pub static DATABASE_URL: &str = "database-url";
+
+/// Reset database first
+pub static RESET_DATABASE: &str = "reset";
