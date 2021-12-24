@@ -2,14 +2,19 @@ use std::path::PathBuf;
 
 use env_logger::Env;
 use log::info;
+
 use crate::db::Db;
+use crate::sponsor_times::SponsorTimes;
 
 mod app;
 mod args;
 mod consts;
 mod db;
 mod http;
+mod indexes;
 mod paths;
+mod sponsor_time;
+mod sponsor_times;
 
 #[tokio::main]
 async fn main() -> Result<(), sqlx::Error> {
@@ -42,10 +47,24 @@ async fn main() -> Result<(), sqlx::Error> {
 
 	db.up().await.unwrap();
 
-	info!("Downloading to: {:?}", &cache_path);
+	if matches.is_present(args::USE_CACHE) && cache_path.exists() {
+		info!("Using cached file");
+	} else {
+		info!("Downloading to: {:?}", &cache_path);
+		let mirror = matches.value_of(args::MIRROR).unwrap();
+		http::download(mirror, &cache_path).await;
+	}
 
-	let mirror = matches.value_of(args::MIRROR).unwrap();
-	http::download(mirror, &cache_path).await;
+	info!("Parsing data from file");
+
+	for time in SponsorTimes::new(&cache_path).unwrap() {
+		if time.start_time == 0_f32 && time.end_time == 0_f32 {
+			continue;
+		}
+
+		info!("{:11}: {:12} - {:12}", &time.video_id,
+			time.start_time, time.end_time);
+	}
 
 	Ok(())
 }

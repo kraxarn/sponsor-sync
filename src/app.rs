@@ -41,6 +41,10 @@ pub fn new(default_cache: &PathBuf) -> App {
 		.long("reset")
 		.help("Reset all current values in the database first");
 
+	let use_cache = Arg::with_name(crate::args::USE_CACHE)
+		.long("use-cache")
+		.help("Use cached file, if it exists, instead of downloading a new one");
+
 	App::new(env!("CARGO_PKG_NAME"))
 		.version(env!("CARGO_PKG_VERSION"))
 		.author(env!("CARGO_PKG_AUTHORS"))
@@ -49,4 +53,5 @@ pub fn new(default_cache: &PathBuf) -> App {
 		.arg(cache_dir)
 		.arg(database_url)
 		.arg(reset_database)
+		.arg(use_cache)
 }

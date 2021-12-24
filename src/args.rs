@@ -12,3 +12,6 @@ pub static DATABASE_URL: &str = "database-url";
 
 /// Reset database first
 pub static RESET_DATABASE: &str = "reset";
+
+/// Use cached file, if it exists
+pub static USE_CACHE: &str = "use-cache";
