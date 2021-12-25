@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use env_logger::Env;
-use log::info;
+use log::{debug, error, info};
 
 use crate::db::Db;
 use crate::sponsor_times::SponsorTimes;
@@ -55,15 +55,22 @@ async fn main() -> Result<(), sqlx::Error> {
 		http::download(mirror, &cache_path).await;
 	}
 
-	info!("Parsing data from file");
+	info!("Adding data to database");
 
 	for time in SponsorTimes::new(&cache_path).unwrap() {
 		if time.start_time == 0_f32 && time.end_time == 0_f32 {
 			continue;
 		}
 
-		info!("{:11}: {:12} - {:12}", &time.video_id,
-			time.start_time, time.end_time);
+		if db.exists(&time.id).await {
+			continue;
+		}
+
+		if let Err(e) = db.add(&time).await {
+			error!("{:?}", e);
+		}
+
+		debug!("Added {}", time.id);
 	}
 
 	Ok(())
