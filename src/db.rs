@@ -3,6 +3,7 @@ use std::env::var;
 use clap::ArgMatches;
 use sqlx::{Pool, Postgres};
 use sqlx::postgres::PgPoolOptions;
+use uuid::Uuid;
 
 use crate::sponsor_time::SponsorTime;
 
@@ -57,7 +58,7 @@ impl Db {
 		Ok(())
 	}
 
-	pub async fn exists(&self, id: &str) -> bool {
+	pub async fn exists(&self, id: &Uuid) -> bool {
 		sqlx::query("select 1 from sponsor_time where id = $1")
 			.bind(id)
 			.fetch_optional(&self.pool)

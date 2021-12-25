@@ -9,12 +9,14 @@ dirs = "4.0"
 log = "0.4"
 env_logger = "0.9"
 futures-util = "0.3"
+uuid = "0.8"
 
 [dependencies.sqlx]
 version = "0.5"
 features = [
     "runtime-tokio-native-tls",
     "postgres",
+    "uuid",
 ]
 
 [dependencies.tokio]
