@@ -1,0 +1,1 @@
+drop index if exists sponsor_time_video_id_idx
