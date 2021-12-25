@@ -1,7 +1,10 @@
 use std::env::var;
+
 use clap::ArgMatches;
-use sqlx::{Pool, Postgres, query};
-use sqlx::postgres::{PgPoolOptions, PgQueryResult};
+use sqlx::{Pool, Postgres};
+use sqlx::postgres::PgPoolOptions;
+
+use crate::sponsor_time::SponsorTime;
 
 pub struct Db {
 	pool: Pool<Postgres>,
@@ -26,15 +29,58 @@ impl Db {
 		}
 	}
 
-	pub async fn up(&self) -> Result<PgQueryResult, sqlx::Error> {
-		query(include_str!("../sql/up.sql"))
-			.execute(&self.pool)
-			.await
+	pub async fn up(&self) -> Result<(), sqlx::Error> {
+		if let Err(e) = sqlx::query_file!("sql/00_sponsor_time/up.sql")
+			.execute(&self.pool).await {
+			return Err(e);
+		}
+
+		if let Err(e) = sqlx::query_file!("sql/01_sponsor_time_video_id_idx/up.sql")
+			.execute(&self.pool).await {
+			return Err(e);
+		}
+
+		Ok(())
 	}
 
-	pub async fn down(&self) -> Result<PgQueryResult, sqlx::Error> {
-		query(include_str!("../sql/down.sql"))
+	pub async fn down(&self) -> Result<(), sqlx::Error> {
+		if let Err(e) = sqlx::query_file!("sql/01_sponsor_time_video_id_idx/down.sql")
+			.execute(&self.pool).await {
+			return Err(e);
+		}
+
+		if let Err(e) = sqlx::query_file!("sql/00_sponsor_time/down.sql")
+			.execute(&self.pool).await {
+			return Err(e);
+		}
+
+		Ok(())
+	}
+
+	pub async fn exists(&self, id: &str) -> bool {
+		sqlx::query("select 1 from sponsor_time where id = $1")
+			.bind(id)
+			.fetch_optional(&self.pool)
+			.await.unwrap()
+			.is_some()
+	}
+
+	/// Add a sponsor time to the database.
+	/// Returns rows affected on success, otherwise, error.
+	pub async fn add(&self, time: &SponsorTime) -> Result<u64, sqlx::Error> {
+		let result = sqlx::query("insert into sponsor_time
+				(id, video_id, start_time, end_time)
+			values ($1, $2, $3, $4)")
+			.bind(&time.id)
+			.bind(&time.video_id)
+			.bind(time.start_time)
+			.bind(time.end_time)
 			.execute(&self.pool)
-			.await
+			.await;
+
+		match result {
+			Ok(q) => Ok(q.rows_affected()),
+			Err(e) => Err(e),
+		}
 	}
 }
