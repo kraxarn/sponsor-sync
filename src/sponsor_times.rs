@@ -2,10 +2,8 @@ use std::cmp::max;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
-use std::str::FromStr;
 
 use log::debug;
-use uuid::Uuid;
 
 use crate::indexes::Indexes;
 use crate::sponsor_time::SponsorTime;
@@ -58,7 +56,7 @@ impl Iterator for SponsorTimes {
 		}
 
 		Some(Self::Item {
-			id: Uuid::from_str(parts[i.id]).unwrap(),
+			id: parts[i.id].to_owned(),
 			video_id: parts[i.video_id].to_owned(),
 			start_time: parts[i.start_time].parse().unwrap(),
 			end_time: parts[i.end_time].parse().unwrap(),
