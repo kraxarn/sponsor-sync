@@ -1,7 +1,8 @@
+use std::fs::remove_file;
 use std::path::PathBuf;
 
 use env_logger::Env;
-use log::{debug, error, info};
+use log::{error, info};
 
 use crate::db::Db;
 use crate::sponsor_times::SponsorTimes;
@@ -17,7 +18,7 @@ mod sponsor_time;
 mod sponsor_times;
 
 #[tokio::main]
-async fn main() -> Result<(), sqlx::Error> {
+async fn main() {
 	// By default, log everything from current crate
 	env_logger::Builder::from_env(Env::default()
 		.default_filter_or("sponsor_sync"))
@@ -71,5 +72,7 @@ async fn main() -> Result<(), sqlx::Error> {
 		}
 	}
 
-	Ok(())
+	if !matches.is_present(args::USE_CACHE) {
+		remove_file(&cache_path).unwrap();
+	}
 }
