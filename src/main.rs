@@ -69,8 +69,6 @@ async fn main() -> Result<(), sqlx::Error> {
 		if let Err(e) = db.add(&time).await {
 			error!("{:?}", e);
 		}
-
-		debug!("Added {}", time.id);
 	}
 
 	Ok(())
