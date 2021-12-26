@@ -2,7 +2,7 @@ use std::fs::remove_file;
 use std::path::PathBuf;
 
 use env_logger::Env;
-use log::{error, info};
+use log::{debug, error, info};
 
 use crate::db::Db;
 use crate::sponsor_times::SponsorTimes;
@@ -16,6 +16,14 @@ mod indexes;
 mod paths;
 mod sponsor_time;
 mod sponsor_times;
+
+fn log(current: &mut usize, total: usize) {
+	*current += 1;
+	if *current % 100_000_usize == 0 {
+		debug!("{:>8}/{:<8} ({:>3.0}%)", current, total,
+				*current as f32 / total as f32 * 100_f32);
+	}
+}
 
 #[tokio::main]
 async fn main() {
@@ -58,18 +66,25 @@ async fn main() {
 
 	info!("Adding data to database");
 
-	for time in SponsorTimes::new(&cache_path).unwrap() {
+	let mut times = SponsorTimes::new(&cache_path).unwrap();
+	let mut current = 0_usize;
+	let total = times.total_entries();
+
+	for time in &mut times {
 		if time.start_time == 0_f32 && time.end_time == 0_f32 {
 			continue;
 		}
 
 		if db.exists(&time.id).await {
+			log(&mut current, total);
 			continue;
 		}
 
 		if let Err(e) = db.add(&time).await {
 			error!("{:?}", e);
 		}
+
+		log(&mut current, total);
 	}
 
 	if !matches.is_present(args::USE_CACHE) {
