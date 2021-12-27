@@ -9,6 +9,7 @@ dirs = "4.0"
 log = "0.4"
 env_logger = "0.9"
 futures-util = "0.3"
+url = "2.2"
 
 [dependencies.sqlx]
 version = "0.5"

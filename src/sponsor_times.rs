@@ -67,11 +67,6 @@ impl Iterator for SponsorTimes {
 			return self.next();
 		}
 
-		Some(Self::Item {
-			id: parts[i.id].to_owned(),
-			video_id: parts[i.video_id].to_owned(),
-			start_time: parts[i.start_time].parse().unwrap(),
-			end_time: parts[i.end_time].parse().unwrap(),
-		})
+		Self::Item::parse(&parts, i)
 	}
 }

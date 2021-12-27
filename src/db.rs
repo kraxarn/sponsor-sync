@@ -85,7 +85,7 @@ impl Db {
 				(id, video_id, start_time, end_time)
 			values ($1, $2, $3, $4)")
 			.bind(&time.id)
-			.bind(&time.video_id)
+			.bind(&time.get_video_id())
 			.bind(time.start_time)
 			.bind(time.end_time)
 			.execute(&self.pool)
