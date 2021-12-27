@@ -3,8 +3,6 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 
-use log::debug;
-
 use crate::indexes::Indexes;
 use crate::sponsor_time::SponsorTime;
 
@@ -58,7 +56,6 @@ impl Iterator for SponsorTimes {
 
 		let parts: Vec<&str> = buffer.split(crate::consts::CSV_SEPARATOR).collect();
 		if parts.len() < max {
-			debug!("ignoring line with missing values: {:?}", buffer);
 			return self.next();
 		}
 
