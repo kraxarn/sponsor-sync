@@ -82,6 +82,7 @@ async fn main() {
 	for time in &mut times {
 		if time.start_time == 0_f32 && time.end_time == 0_f32 {
 			ignored.push((time, "invalid interval".to_owned()));
+			add_current(&mut current, total);
 			continue;
 		}
 
