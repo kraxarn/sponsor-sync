@@ -30,12 +30,12 @@ impl Db {
 	}
 
 	pub async fn up(&self) -> Result<(), sqlx::Error> {
-		if let Err(e) = sqlx::query_file!("sql/00_sponsor_time/up.sql")
+		if let Err(e) = sqlx::query(include_str!("../sql/00_sponsor_time/up.sql"))
 			.execute(&self.pool).await {
 			return Err(e);
 		}
 
-		if let Err(e) = sqlx::query_file!("sql/01_sponsor_time_video_id_idx/up.sql")
+		if let Err(e) = sqlx::query(include_str!("../sql/01_sponsor_time_video_id_idx/up.sql"))
 			.execute(&self.pool).await {
 			return Err(e);
 		}
@@ -44,12 +44,12 @@ impl Db {
 	}
 
 	pub async fn down(&self) -> Result<(), sqlx::Error> {
-		if let Err(e) = sqlx::query_file!("sql/01_sponsor_time_video_id_idx/down.sql")
+		if let Err(e) = sqlx::query(include_str!("../sql/01_sponsor_time_video_id_idx/down.sql"))
 			.execute(&self.pool).await {
 			return Err(e);
 		}
 
-		if let Err(e) = sqlx::query_file!("sql/00_sponsor_time/down.sql")
+		if let Err(e) = sqlx::query(include_str!("../sql/00_sponsor_time/down.sql"))
 			.execute(&self.pool).await {
 			return Err(e);
 		}
