@@ -17,7 +17,8 @@ mod paths;
 mod sponsor_time;
 mod sponsor_times;
 
-fn log(current: &mut usize, total: usize) {
+/// Log added entry
+fn add_current(current: &mut usize, total: usize) {
 	*current += 1;
 	if *current % 100_000_usize == 0 {
 		debug!("{:>8}/{:<8} ({:>3.0}%)", current, total,
@@ -85,7 +86,7 @@ async fn main() {
 			Some(s) => s.contains(&time.id),
 			None => db.exists(&time.id).await
 		} {
-			log(&mut current, total);
+			add_current(&mut current, total);
 			continue;
 		}
 
@@ -93,7 +94,7 @@ async fn main() {
 			error!("{:?}", e);
 		}
 
-		log(&mut current, total);
+		add_current(&mut current, total);
 	}
 
 	if !matches.is_present(args::USE_CACHE) {
