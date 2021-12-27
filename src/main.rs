@@ -5,6 +5,7 @@ use env_logger::Env;
 use log::{debug, info, warn};
 
 use crate::db::Db;
+use crate::sponsor_time_error::SponsorTimeError;
 use crate::sponsor_times::SponsorTimes;
 
 mod app;
@@ -16,6 +17,7 @@ mod indexes;
 mod paths;
 mod sponsor_time;
 mod sponsor_times;
+mod sponsor_time_error;
 
 /// Log added entry
 fn add_current(current: &mut usize, total: usize) {
@@ -81,7 +83,7 @@ async fn main() {
 
 	for time in &mut times {
 		if time.start_time == 0_f32 && time.end_time == 0_f32 {
-			ignored.push((time, "invalid interval".to_owned()));
+			ignored.push((time, SponsorTimeError::InvalidInterval));
 			add_current(&mut current, total);
 			continue;
 		}
@@ -95,10 +97,11 @@ async fn main() {
 		}
 
 		if let Err(e) = db.add(&time).await {
-			ignored.push((time, match e.as_database_error() {
-				Some(e) => e.message(),
-				None => "database error",
-			}.to_owned()));
+			let message = match e.as_database_error() {
+				Some(e) => Some(e.message().to_owned()),
+				None => None,
+			};
+			ignored.push((time, SponsorTimeError::DatabaseError(message)));
 		}
 
 		add_current(&mut current, total);
