@@ -70,12 +70,21 @@ async fn main() {
 	let mut current = 0_usize;
 	let total = times.total_entries();
 
+	let existing = if matches.is_present(args::LOW_MEMORY) {
+		Some(db.get_ids().await)
+	} else {
+		None
+	};
+
 	for time in &mut times {
 		if time.start_time == 0_f32 && time.end_time == 0_f32 {
 			continue;
 		}
 
-		if db.exists(&time.id).await {
+		if match &existing {
+			Some(s) => s.contains(&time.id),
+			None => db.exists(&time.id).await
+		} {
 			log(&mut current, total);
 			continue;
 		}

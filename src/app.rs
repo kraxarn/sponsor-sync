@@ -42,8 +42,14 @@ pub fn new(default_cache: &PathBuf) -> App {
 		.help("Reset all current values in the database first");
 
 	let use_cache = Arg::with_name(crate::args::USE_CACHE)
+		.short("k")
 		.long("use-cache")
 		.help("Use cached file, if it exists, instead of downloading a new one");
+
+	let low_memory = Arg::with_name(crate::args::LOW_MEMORY)
+		.short("m")
+		.long("low-memory")
+		.help("Minimize memory usage, at the cost of longer execution time");
 
 	App::new(env!("CARGO_PKG_NAME"))
 		.version(env!("CARGO_PKG_VERSION"))
@@ -54,4 +60,5 @@ pub fn new(default_cache: &PathBuf) -> App {
 		.arg(database_url)
 		.arg(reset_database)
 		.arg(use_cache)
+		.arg(low_memory)
 }
