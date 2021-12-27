@@ -23,7 +23,7 @@ mod sponsor_time_error;
 fn add_current(current: &mut usize, total: usize) {
 	*current += 1;
 	if *current % 100_000_usize == 0 {
-		debug!("{:>8}/{:<8} ({:>3.0}%)", current, total,
+		debug!("{:<8}/{:>8} ({:>3.0}%)", current, total,
 				*current as f32 / total as f32 * 100_f32);
 	}
 }
