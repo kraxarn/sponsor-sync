@@ -1,8 +1,7 @@
-use std::collections::HashSet;
 use std::env::var;
 
 use clap::ArgMatches;
-use sqlx::{Pool, Postgres, Row};
+use sqlx::{Pool, Postgres};
 use sqlx::postgres::PgPoolOptions;
 
 use crate::sponsor_time::SponsorTime;
@@ -64,18 +63,6 @@ impl Db {
 			.fetch_optional(&self.pool)
 			.await.unwrap()
 			.is_some()
-	}
-
-	pub async fn get_ids(&self) -> HashSet<String> {
-		let ids = sqlx::query("select id from sponsor_time")
-			.fetch_all(&self.pool)
-			.await.unwrap();
-
-		let mut set = HashSet::new();
-		for id in ids {
-			set.insert(id.get(0));
-		}
-		set
 	}
 
 	/// Add a sponsor time to the database.
