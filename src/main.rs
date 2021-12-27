@@ -1,5 +1,6 @@
 use std::fs::remove_file;
 use std::path::PathBuf;
+use std::time::Instant;
 
 use env_logger::Env;
 use log::{debug, info, warn};
@@ -34,6 +35,8 @@ async fn main() {
 	env_logger::Builder::from_env(Env::default()
 		.default_filter_or("sponsor_sync"))
 		.init();
+
+	let start = Instant::now();
 
 	let default_cache = paths::cache();
 	let app = app::new(&default_cache);
@@ -119,4 +122,7 @@ async fn main() {
 			"items"
 		});
 	}
+
+	let elapsed = start.elapsed().as_secs();
+	info!("Synced in {:02}:{:02}", elapsed / 60, elapsed % 60);
 }
