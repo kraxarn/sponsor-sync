@@ -22,15 +22,10 @@ impl SponsorTimes {
 		let mut buffer = String::new();
 		reader.read_line(&mut buffer)?;
 
-		let indexes = match Indexes::new(&buffer) {
-			Ok(i) => i,
-			Err(e) => panic!("missing fields: {}", e),
-		};
-
 		Ok(Self {
 			total: Self::get_total_entries(path)?,
 			reader,
-			indexes,
+			indexes: Indexes::new(&buffer)?,
 		})
 	}
 

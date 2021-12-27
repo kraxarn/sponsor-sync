@@ -1,3 +1,5 @@
+use std::io::ErrorKind;
+
 pub struct Indexes {
 	/// Index of UUID
 	pub id: usize,
@@ -19,7 +21,7 @@ impl Indexes {
 		}
 	}
 
-	pub fn new(line: &str) -> Result<Self, String> {
+	pub fn new(line: &str) -> Result<Self, std::io::Error> {
 		let mut indexes = Self::empty();
 		let parts: Vec<&str> = line.split(crate::consts::CSV_SEPARATOR).collect();
 
@@ -34,7 +36,9 @@ impl Indexes {
 		}
 
 		match indexes.get_all_invalid() {
-			Some(i) => Err(i.join(", ")),
+			Some(i) => Err(std::io::Error::new(
+				ErrorKind::InvalidData,
+				format!("invalid fields: {}", i.join(", ")))),
 			None => Ok(indexes),
 		}
 	}

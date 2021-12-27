@@ -2,7 +2,7 @@ use std::fs::remove_file;
 use std::path::PathBuf;
 
 use env_logger::Env;
-use log::{debug, error, info};
+use log::{debug, info, warn};
 
 use crate::db::Db;
 use crate::sponsor_times::SponsorTimes;
@@ -67,6 +67,8 @@ async fn main() {
 
 	info!("Adding data to database");
 
+	let mut ignored = Vec::new();
+
 	let mut times = SponsorTimes::new(&cache_path).unwrap();
 	let mut current = 0_usize;
 	let total = times.total_entries();
@@ -79,6 +81,7 @@ async fn main() {
 
 	for time in &mut times {
 		if time.start_time == 0_f32 && time.end_time == 0_f32 {
+			ignored.push((time, "invalid interval".to_owned()));
 			continue;
 		}
 
@@ -91,7 +94,10 @@ async fn main() {
 		}
 
 		if let Err(e) = db.add(&time).await {
-			error!("{:?}", e);
+			ignored.push((time, match e.as_database_error() {
+				Some(e) => e.message(),
+				None => "database error",
+			}.to_owned()));
 		}
 
 		add_current(&mut current, total);
@@ -99,5 +105,14 @@ async fn main() {
 
 	if !matches.is_present(args::USE_CACHE) {
 		remove_file(&cache_path).unwrap();
+	}
+
+	if ignored.len() > 0 {
+		let len = ignored.len();
+		warn!("{} {} were ignored", len, if len == 1 {
+			"item"
+		} else {
+			"items"
+		});
 	}
 }
